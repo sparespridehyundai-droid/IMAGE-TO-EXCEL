@@ -1,0 +1,59 @@
+
+import { CellMapping } from './types';
+
+export const FIELD_MAPPING: CellMapping[] = [
+  // Header
+  { key: 'roNo', label: 'R/O No', cell: 'B2' },
+  { key: 'btNo', label: 'B.T No', cell: 'D2' },
+  { key: 'status', label: 'Status', cell: 'F2' },
+
+  // Car Info (Left Block)
+  { key: 'vin', label: 'VIN', cell: 'B4' },
+  { key: 'regNo', label: 'Reg. No', cell: 'B5' },
+  { key: 'brand', label: 'Brand', cell: 'B6' },
+  { key: 'fuelType', label: 'Fuel Type', cell: 'B7' },
+  { key: 'model', label: 'Model', cell: 'B8' },
+  { key: 'vehicleType', label: 'Vehicle Type', cell: 'B9' },
+  
+  // Car Info (Right Block)
+  { key: 'lastMileage', label: 'Last Mileage', cell: 'D4' },
+  { key: 'saleDate', label: 'Sale Date', cell: 'D5' },
+  { key: 'saleDealer', label: 'Sale Dealer', cell: 'D6' },
+  { key: 'engineNo', label: 'Engine No', cell: 'D7' },
+  { key: 'variant', label: 'Variant', cell: 'D8' },
+
+  // Owner Info (Left Block)
+  { key: 'customerNo', label: 'Customer No', cell: 'G4' },
+  { key: 'mainMobile', label: 'Main Mobile No.', cell: 'G5' },
+  { key: 'altMobile', label: 'Alt. Mobile No.', cell: 'G6' },
+  { key: 'whatsappId', label: 'WhatsApp ID', cell: 'G7' },
+  { key: 'location', label: 'Location', cell: 'G8' },
+  { key: 'state', label: 'State', cell: 'G9' },
+
+  // Owner Info (Right Block)
+  { key: 'ownerName', label: 'Owner Name', cell: 'I4' },
+  { key: 'customerType', label: 'Customer Type', cell: 'I5' },
+  { key: 'email', label: 'E-mail', cell: 'I6' },
+  { key: 'address', label: 'Address', cell: 'I7' },
+  { key: 'pinCode', label: 'PIN Code', cell: 'I8' },
+  { key: 'city', label: 'City', cell: 'I9' },
+
+  // Work Details
+  { key: 'workType', label: 'Work Type', cell: 'B11' },
+  { key: 'incidentType', label: 'Incident Type', cell: 'B12' },
+  { key: 'estimateNo', label: 'Estimate No', cell: 'B13' },
+  { key: 'promisedTime', label: 'Prom. Time', cell: 'B14' },
+  { key: 'delayReason', label: 'Delay Reason', cell: 'B15' },
+
+  { key: 'roDate', label: 'R/O Date', cell: 'D11' },
+  { key: 'visitType', label: 'Visit Type', cell: 'D12' },
+  { key: 'svcAdv', label: 'Svc Adv.', cell: 'D13' },
+  { key: 'estimateAmt', label: 'Estimate Amt', cell: 'D14' },
+  { key: 'actualTime', label: 'Actual Time', cell: 'D15' },
+
+  // Totals
+  { key: 'partAmt', label: 'Part Amt', cell: 'B18' },
+  { key: 'laborAmt', label: 'Labor Amt', cell: 'D18' },
+  { key: 'otherAmt', label: 'Other Amt', cell: 'F18' },
+  { key: 'totalAmt', label: 'Total Amt', cell: 'H18' },
+];

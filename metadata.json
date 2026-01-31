@@ -1,0 +1,7 @@
+{
+  "name": "GDMS Form to Excel AI",
+  "description": "Extracts structured data from GDMS repair order screenshots using Gemini Vision and exports them to a formatted Excel file with consistent cell mapping.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
