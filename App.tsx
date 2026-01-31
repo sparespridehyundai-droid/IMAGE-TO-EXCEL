@@ -5,7 +5,7 @@ import { Uploader } from './components/Uploader';
 import { DataPreview } from './components/DataPreview';
 import { extractRepairOrderData } from './services/geminiService';
 import { RepairOrderData } from './types';
-import { AlertCircle, FileText } from 'lucide-react';
+import { AlertCircle, FileSpreadsheet, Sparkles, Layers } from 'lucide-react';
 
 interface ProcessedResult {
   id: string;
@@ -18,15 +18,15 @@ const App: React.FC = () => {
   const [results, setResults] = useState<ProcessedResult[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  const handleBatchProcess = async (base64Array: string[]) => {
+  const handleProcessBatch = async (base64Array: string[]) => {
     setIsProcessing(true);
     setError(null);
     
     try {
       const newResults: ProcessedResult[] = [];
       
-      // Process files one by one to avoid overwhelming the API rate limits
-      // and to ensure better error handling per file.
+      // Process sequential so we don't overwhelm anything, or in parallel for speed
+      // Sequential is safer for demo purposes with Gemini API rate limits
       for (const base64 of base64Array) {
         try {
           const data = await extractRepairOrderData(base64);
@@ -36,18 +36,18 @@ const App: React.FC = () => {
             thumbnail: base64
           });
         } catch (err) {
-          console.error("Error processing one of the files", err);
-          // We continue with other files even if one fails
+          console.error("Extraction error for image", err);
+          // We continue with others if one fails
         }
       }
 
       if (newResults.length === 0 && base64Array.length > 0) {
-        throw new Error("Could not extract data from any of the provided images. Please check image quality.");
+        throw new Error("Could not extract valid data from any of the provided images. Please check the image quality.");
       }
 
       setResults(prev => [...newResults, ...prev]);
     } catch (err: any) {
-      setError(err.message || "An unexpected error occurred during extraction.");
+      setError(err.message || "An unexpected error occurred during batch processing.");
     } finally {
       setIsProcessing(false);
     }
@@ -57,59 +57,79 @@ const App: React.FC = () => {
     setResults(prev => prev.filter(r => r.id !== id));
   };
 
-  const clearAll = () => {
+  const clearAllResults = () => {
     setResults([]);
   };
 
   return (
     <Layout>
-      <div className="space-y-10 pb-20">
-        <section className="text-center space-y-4 pt-4">
-          <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 px-4 py-2 rounded-full text-sm font-bold mb-2">
-            <FileText size={16} />
-            <span>GDMS 2.0 AUTOMATION</span>
+      <div className="space-y-12 pb-24">
+        {/* Hero Section */}
+        <section className="text-center space-y-4 pt-8">
+          <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest mb-2 shadow-sm uppercase">
+            <Sparkles size={12} />
+            <span>AI Multi-Source Batching</span>
           </div>
-          <h2 className="text-4xl font-extrabold text-gray-900 tracking-tight sm:text-6xl">
-            Image to <span className="text-blue-600">Smart Excel</span>
+          <h2 className="text-5xl md:text-7xl font-black text-gray-900 tracking-tighter">
+            One Sheet, <span className="text-blue-600">All Data.</span>
           </h2>
-          <p className="text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
-            Batch process your repair order screenshots. Upload multiple images, and we'll organize them all into a perfectly formatted, single-sheet Excel workbook.
+          <p className="text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed font-medium">
+            Combine files, screenshots, and camera snaps into a single queue. We extract everything into one unified 6-column Excel file.
           </p>
         </section>
 
+        {/* Error Alert */}
         {error && (
-          <div className="max-w-3xl mx-auto bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-2xl flex items-center gap-4 animate-in fade-in duration-300">
-            <AlertCircle className="shrink-0" />
-            <p className="text-sm font-medium">{error}</p>
+          <div className="max-w-3xl mx-auto bg-red-50 border-l-4 border-red-500 text-red-700 px-6 py-4 rounded-2xl flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+            <AlertCircle className="shrink-0 text-red-500" />
+            <p className="text-sm font-bold">{error}</p>
           </div>
         )}
 
-        <Uploader onUpload={handleBatchProcess} isLoading={isProcessing} />
+        {/* Multi-Source Uploader */}
+        <Uploader onProcess={handleProcessBatch} isLoading={isProcessing} />
 
+        {/* Results / Preview Component */}
         {results.length > 0 && (
-          <DataPreview 
-            results={results} 
-            onRemove={removeResult} 
-            onClearAll={clearAll} 
-          />
+          <div className="max-w-6xl mx-auto">
+            <div className="mb-6 flex items-center gap-3">
+              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white">
+                <Layers size={16} />
+              </div>
+              <h2 className="text-2xl font-black text-gray-800 tracking-tight">Consolidated Batch</h2>
+              <span className="text-xs font-bold text-gray-400 bg-gray-100 px-3 py-1 rounded-full">{results.length} Records</span>
+            </div>
+            <DataPreview 
+              results={results} 
+              onRemove={removeResult} 
+              onClearAll={clearAllResults} 
+            />
+          </div>
         )}
         
+        {/* Empty State / Benefits */}
         {results.length === 0 && !isProcessing && (
-          <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 pt-8">
-            <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm text-center">
-              <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-5 font-bold text-2xl">1</div>
-              <h3 className="font-bold text-gray-900 mb-2 text-lg">Select Multiple</h3>
-              <p className="text-sm text-gray-500 leading-relaxed">Choose all screenshots you want to process at once. Our AI handles the batch.</p>
+          <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 pt-10 border-t border-gray-100">
+            <div className="text-center space-y-3">
+              <div className="w-12 h-12 bg-white shadow-md border border-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-2 text-blue-600">
+                <Sparkles size={24} />
+              </div>
+              <h3 className="font-black text-gray-800 uppercase text-xs tracking-widest text-center">AI Extraction</h3>
+              <p className="text-sm text-gray-400 font-medium leading-snug">Gemini AI reads every field from your GDMS forms with high precision.</p>
             </div>
-            <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm text-center">
-              <div className="w-14 h-14 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center mx-auto mb-5 font-bold text-2xl">2</div>
-              <h3 className="font-bold text-gray-900 mb-2 text-lg">AI Vision</h3>
-              <p className="text-sm text-gray-500 leading-relaxed">Gemini scans every image, identifying RO Numbers, VINs, and financial data automatically.</p>
+            <div className="text-center space-y-3">
+              <div className="w-12 h-12 bg-white shadow-md border border-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-2 text-green-600">
+                <FileSpreadsheet size={24} />
+              </div>
+              <h3 className="font-black text-gray-800 uppercase text-xs tracking-widest text-center">Single Excel</h3>
+              <p className="text-sm text-gray-400 font-medium leading-snug">No matter the source, all data is appended into one master spreadsheet.</p>
             </div>
-            <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm text-center">
-              <div className="w-14 h-14 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-5 font-bold text-2xl">3</div>
-              <h3 className="font-bold text-gray-900 mb-2 text-lg">Unified Sheet</h3>
-              <p className="text-sm text-gray-500 leading-relaxed">Download one single Excel file containing data from all your images in perfect rows.</p>
+            <div className="text-center space-y-3">
+              <div className="w-12 h-12 bg-white shadow-md border border-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-2 text-orange-500">
+                <Layers size={24} />
+              </div>
+              <h3 className="font-black text-gray-800 uppercase text-xs tracking-widest text-center">6-Column Grid</h3>
+              <p className="text-sm text-gray-400 font-medium leading-snug">Formatted in 3-pair rows for readability while maintaining 6 fixed columns.</p>
             </div>
           </div>
         )}
